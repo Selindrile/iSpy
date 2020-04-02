@@ -45,6 +45,8 @@ windower.register_event('addon command',function (...)
 	elseif SpiedMobs[cmd[1]] then
 		windower.add_to_chat(7,'Spied mobs set to '..cmd[1]..'.')
 		setting = cmd[1]
+	else
+		windower.add_to_chat(7,'Error: that setting does not exist.')
     end
 
 end)

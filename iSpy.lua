@@ -14,7 +14,7 @@ report = false
 lastreported = nil
 
 SpiedMobs = {
-	odyssey = S{'Chest'},
+	odyssey = S{'Chest','Coffer','Strongbox'},
 	nyzul = S{'Runic Lamp'},
 	questions = S{'???'},
 	}

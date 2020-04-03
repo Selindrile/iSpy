@@ -1,6 +1,6 @@
 iSpy: Addon for automatically targetting NPCs like chests in Odyssey and Lamps in Nyzul.
 
-NOTE: The 4/2/2020 update broke this method of targetting NPCs and there may be no way to fix it.
+NOTE: This method of targetting NPCs does not work on all NPCs, uncertain as to why.
 
 Uncertain as to the future of the addon.
 

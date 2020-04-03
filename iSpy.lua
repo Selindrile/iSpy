@@ -11,7 +11,8 @@ res = require('resources')
 spy = true
 setting = 'odyssey'
 report = false
-lastreported = nil
+found = T{}
+found_index = 1
 
 SpiedMobs = {
 	odyssey = S{'Chest','Coffer','Strongbox'},
@@ -56,19 +57,36 @@ function Spy()
 		local player = windower.ffxi.get_player()
 		if player.target_index == nil then
 			local mobs = windower.ffxi.get_mob_array()
+			local best_match
 			for i, mob in pairs(mobs) do
 				if SpiedMobs[setting]:contains(mob.name) and (math.sqrt(mob.distance) < 50) then
-					windower.add_to_chat(7,mob.name)
-					packets.inject(packets.new('incoming', 0x058, {
-						['Player'] = player.id,
-						['Target'] = mob.id,
-						['Player Index'] = player.index,
-					}))
-					if report and lastreported ~= mob.id then
-						windower.chat.input('/p Found ['..mob.name..'] at <pos>!')
-						lastreported = mob.id
+					--windower.add_to_chat(7,mob.name)
+					if best_match == nil or (found:contains(best_match.id) and not found:contains(mob.id)) or mob.distance < best_match.distance then
+						best_match = mob
+						--windower.add_to_chat(7,'new best: '..best_match.name..'')
 					end
-					return
+				end
+			end
+
+			if best_match ~= nil then
+				--windower.add_to_chat(7,'targetting: '..best_match.name..'')
+				packets.inject(packets.new('incoming', 0x058, {
+					['Player'] = player.id,
+					['Target'] = best_match.id,
+					['Player Index'] = player.index,
+				}))
+				
+				if not found:contains(best_match.id) then
+					if report then
+						windower.chat.input('/p Found ['..best_match.name..'] at <pos>!')
+					end
+					
+					found[found_index] = best_match.id
+					if found_index > 3 then
+						found_index = 1
+					else
+						found_index = found_index + 1
+					end
 				end
 			end
 		end

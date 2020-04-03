@@ -53,24 +53,26 @@ end)
 
 function Spy()
 	if spy then
-		local mobs = windower.ffxi.get_mob_array()
-		for i, mob in pairs(mobs) do
-			if SpiedMobs[setting]:contains(mob.name) and (math.sqrt(mob.distance) < 50) then
-				local player = windower.ffxi.get_player()
-				if player.target_index == nil then
+		local player = windower.ffxi.get_player()
+		if player.target_index == nil then
+			local mobs = windower.ffxi.get_mob_array()
+			for i, mob in pairs(mobs) do
+				if SpiedMobs[setting]:contains(mob.name) and (math.sqrt(mob.distance) < 50) then
+					windower.add_to_chat(7,mob.name)
 					packets.inject(packets.new('incoming', 0x058, {
 						['Player'] = player.id,
 						['Target'] = mob.id,
 						['Player Index'] = player.index,
 					}))
-					if report and mob.id ~= lastreported then
+					if report and lastreported ~= mob.id then
 						windower.chat.input('/p Found ['..mob.name..'] at <pos>!')
 						lastreported = mob.id
 					end
+					return
 				end
 			end
 		end
 	end
 end
 
-Spy:loop(2)
+Spy:loop(1)

@@ -59,7 +59,7 @@ function Spy()
 			local mobs = windower.ffxi.get_mob_array()
 			local best_match
 			for i, mob in pairs(mobs) do
-				if SpiedMobs[setting]:contains(mob.name) and (math.sqrt(mob.distance) < 50) then
+				if SpiedMobs[setting]:contains(mob.name) and mob.valid_target and (math.sqrt(mob.distance) < 50) then
 					--windower.add_to_chat(7,mob.name)
 					if best_match == nil or (found:contains(best_match.id) and not found:contains(mob.id)) or mob.distance < best_match.distance then
 						best_match = mob
@@ -100,4 +100,4 @@ function Spy()
 	end
 end
 
-Spy:loop(1.5)
+Spy:loop(1)

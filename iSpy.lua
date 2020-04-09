@@ -69,16 +69,23 @@ function Spy()
 			end
 
 			if best_match ~= nil then
-				--windower.add_to_chat(7,'targetting: '..best_match.name..'')
-				packets.inject(packets.new('incoming', 0x058, {
-					['Player'] = player.id,
-					['Target'] = best_match.id,
-					['Player Index'] = player.index,
-				}))
+				
+				local self_vector = windower.ffxi.get_mob_by_id(player.id)
+				local angle = (math.atan2((best_match.y - self_vector.y), (best_match.x - self_vector.x))*180/math.pi)*-1
+				windower.ffxi.turn((angle):radian())
 				
 				if not found:contains(best_match.id) then
+					--windower.add_to_chat(7,'targetting: '..best_match.name..'')
+					packets.inject(packets.new('incoming', 0x058, {
+						['Player'] = player.id,
+						['Target'] = best_match.id,
+						['Player Index'] = player.index,
+					}))
+	
 					if report then
 						windower.chat.input('/p Found ['..best_match.name..'] at <pos>!')
+					else
+						windower.add_to_chat(7,'Found ['..best_match.name..']!')
 					end
 					
 					found[found_index] = best_match.id
@@ -93,4 +100,4 @@ function Spy()
 	end
 end
 
-Spy:loop(1)
+Spy:loop(1.5)

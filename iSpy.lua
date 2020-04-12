@@ -23,12 +23,13 @@ SpiedMobs = {
 
 windower.register_event('addon command',function (...)
     cmd = {...}
-
+	local command
+	
 	if cmd[1] ~= nil then
-		cmd[1] = cmd[1]:lower()
+		command = cmd[1]:lower()
 	end
 	
-	if cmd[1] == nil then
+	if command == nil then
 		if spy == true then
 			spy = false
 			windower.add_to_chat(7,'Spying is [OFF].')
@@ -36,7 +37,7 @@ windower.register_event('addon command',function (...)
 			spy = true
 			windower.add_to_chat(7,'Spying is [ON].')
 		end
-	elseif cmd[1] == 'target' then
+	elseif command == 'target' then
 		local player = windower.ffxi.get_player()
 		local last_found_index
 		if found_index == 1 then
@@ -50,7 +51,7 @@ windower.register_event('addon command',function (...)
 			['Target'] = found[last_found_index],
 			['Player Index'] = player.index,
 		}))
-	elseif cmd[1] == 'report' then
+	elseif command == 'report' then
 		if report == true then
 			report = false
 			windower.add_to_chat(7,'Reporting is [OFF].')
@@ -58,11 +59,14 @@ windower.register_event('addon command',function (...)
 			report = true
 			windower.add_to_chat(7,'Reporting is [ON].')
 		end
-	elseif SpiedMobs[cmd[1]] then
-		windower.add_to_chat(7,'Spied mobs set to '..cmd[1]..'.')
-		setting = cmd[1]
+	elseif SpiedMobs[command] then
+		windower.add_to_chat(7,'Spied mobs set to '..command..'.')
+		setting = command
 	else
-		windower.add_to_chat(7,'Error: that setting does not exist.')
+		local custom = table.concat(cmd, ' ')
+		windower.add_to_chat(7,'Setting not found, spying for: '..custom..'.')
+		SpiedMobs.custom = S{custom}
+		setting = 'custom'
     end
 
 end)

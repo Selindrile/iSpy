@@ -16,7 +16,7 @@ found_index = 1
 best_match = nil
 
 SpiedMobs = {
-	odyssey = S{'Chest','Coffer','Strongbox'},
+	odyssey = S{'Chest','Coffer','Aurum Strongbox'},
 	nyzul = S{'Runic Lamp'},
 	questions = S{'???'},
 	}

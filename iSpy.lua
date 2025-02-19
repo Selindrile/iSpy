@@ -8,6 +8,8 @@ require('coroutine')
 packets = require('packets')
 texts = require('texts')
 
+auto_target = false --whether to autotarget newly found items
+auto_face = true --whether to face the closest found object
 spy = true
 setting = 'odyssey'
 report = false
@@ -33,9 +35,26 @@ windower.register_event('addon command',function (...)
 		if spy == true then
 			spy = false
 			windower.add_to_chat(7,'Spying is [OFF].')
+			displayBox:clear()
 		else
 			spy = true
 			windower.add_to_chat(7,'Spying is [ON].')
+		end
+	elseif command == 'autoface' then	
+		if auto_face then
+			auto_face = false
+			windower.add_to_chat(7,'Auto-Face is [OFF].')
+		else
+			auto_face = true
+			windower.add_to_chat(7,'Auto-Face is [ON].')
+		end
+	elseif command == 'autotarget' then
+		if auto_target then
+			auto_target = false
+			windower.add_to_chat(7,'Auto-Target is [OFF].')
+		else
+			auto_target = true
+			windower.add_to_chat(7,'Auto-Target is [ON].')
 		end
 	elseif command == 'target' then
 		local player = windower.ffxi.get_player()
@@ -90,22 +109,24 @@ function Spy()
 			local self_vector = windower.ffxi.get_mob_by_id(player.id)
 			local angle = (math.atan2((best_match.y - self_vector.y), (best_match.x - self_vector.x))*180/math.pi)*-1
 
-			if player.target_index == nil then windower.ffxi.turn((angle):radian())	end
-				
-			if not found:contains(best_match.id) then
+			if player.target_index == nil then
+				if auto_face then windower.ffxi.turn((angle):radian()) end
+
 				--windower.add_to_chat(7,'targetting: '..best_match.name..'')
-				if player.target_index == nil then
+				if auto_target then
 					packets.inject(packets.new('incoming', 0x058, {
 						['Player'] = player.id,
 						['Target'] = best_match.id,
 						['Player Index'] = player.index,
 					}))
 				end
-
+			end
+				
+			if not found:contains(best_match.id) then
 				if report then
 					windower.chat.input('/p Found ['..best_match.name..'] at <pos>!')
 				else
-					windower.add_to_chat(7,'iSpy: Found: ['..best_match.name..'] !')
+					windower.add_to_chat(7,'iSpy: Found: ['..best_match.name..']!')
 				end
 				
 				found[found_index] = best_match.id
@@ -117,14 +138,14 @@ function Spy()
 			end
 			
 			local direction = (angle):radian()
-			local directionText = "None"
-			if direction < 0.3925 and direction > -0.3925 then directionText = "E"
+			local directionText = "?"
+			if direction < 0.3925 and direction >= -0.3925 then directionText = "E "
 			elseif direction >= 0.3925 and direction < 1.1775 then directionText = "SE"
-			elseif direction >= 1.1775 and direction < 1.9625 then directionText = "S"
+			elseif direction >= 1.1775 and direction < 1.9625 then directionText = "S "
 			elseif direction >= 1.9625 and direction < 2.7475 then directionText = "SW"
-			elseif direction >= 2.7475 or ( direction > -3.14 and direction < -2.7475 ) then directionText = "W"
+			elseif direction >= 2.7475 or ( direction > -3.14 and direction < -2.7475 ) then directionText = "W "
 			elseif direction >= -2.7475 and direction < -1.9625 then directionText = "NW"
-			elseif direction >= -1.9625 and direction < -1.1775 then directionText = "N"
+			elseif direction >= -1.9625 and direction < -1.1775 then directionText = "N "
 			elseif direction >= -1.1775 and direction < -0.3925 then directionText = "NE" end
 
 			update_displaybox(best_match.name, directionText, math.floor(math.sqrt(best_match.distance)))
@@ -138,8 +159,8 @@ function create_display()
     if displayBox then displayBox:destroy() end
 	
 	local windowersettings = windower.get_windower_settings()
-	x = (windowersettings["ui_x_res"] / 2) - 80
-	y = windowersettings["ui_y_res"] * (3/4)
+	x = (windowersettings["ui_x_res"] / 2.72)
+	y = windowersettings["ui_y_res"] * (7.05/8)
 	
     displayBox = texts.new()
     displayBox:pos(x,y)
@@ -183,4 +204,3 @@ end
 
 create_display()
 Spy:loop(1)
-
